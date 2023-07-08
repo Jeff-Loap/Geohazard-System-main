@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Image to MySQL Database</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    #upload-container {
+      position: relative;
+      display: inline-block;
+    }
+    #upload-controls {
+      position: relative;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center;
+    }
+    #uploaded-image {
+      position: relative;
+      top: 10px;
+      left: 20px;
+      max-width: 300px;
+      max-height: 300px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- 图片列表容器 -->
+<div id="image-list">
+</div>
+
+  <div id="upload-container">
+    <div id="upload-controls">
+      <input type="file" name="image" accept="image/*" onchange="changeImg(event)"/>
+      <button onclick="submit()">上传</button>
+      <button onclick="loadImage()">显示图片</button>
+    </div>
+    <img id="uploaded-image" alt="Uploaded Image" />
+  </div>
+
+  <script>
+    let file = ''
+    let fileName = ''
+
+    function submit() {
+      let data = new FormData()
+      data.append('imgName', fileName)
+      data.append('image', file); // 更改这里的字段名称
+
+      $.ajax({
+        type: 'POST',
+        url: 'http://localhost:3000',
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        timeout: 2000,
+        success: function (data) {
+          console.log(data)
+          // 不再自动加载图片
+          // loadImage() // 上传完成后加载图片
+        },
+        error: function (error) {
+          console.log(error)
+        }
+      });
+    }
+
+    function changeImg(e) {
+      file = e.target.files.item(0)
+      if (file === null) {
+        return
+      }
+      fileName = file.name
+    }
+
+//     function loadImage() {
+//       $.ajax({
+//         type: 'GET',
+//         url: 'http://localhost:3000',
+//         cache: false,
+//         timeout: 2000,
+//         xhrFields: {
+//           responseType: 'blob'
+//         },
+//         success: function (data) {
+//           const blob = new Blob([data]);
+//           const url = window.URL.createObjectURL(blob);
+//           const img = document.getElementById('uploaded-image');
+//       img.src = url;
+//       img.style.display = 'block'; // 显示图片
+//     },
+//     error: function (error) {
+//       console.log(error);
+//     }
+//   });
+// }
+
+
+  function loadImage() {
+    $.ajax({
+      type: 'GET',
+      url: 'http://localhost:3000',
+      cache: false,
+      timeout: 2000,
+      success: function (data) {
+        const imageList = document.getElementById('image-list');
+        imageList.innerHTML = ''; // 清空图片列表容器
+
+        // 遍历所有图片信息，并将它们添加到图片列表容器中
+        for (let i = 0; i < data.length; i++) {
+          const imgData = data[i];
+          const imagePath = imgData.image;
+
+          const img = document.createElement('img');
+          img.src = `http://localhost:3000/landmark-image/${imgData.landmarkId}`;
+
+          img.style.maxWidth = '300px';
+          img.style.maxHeight = '300px';
+          img.style.margin = '10px';
+
+          imageList.appendChild(img);
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  }
+
+
+
+</script>
+</body>
+</html>

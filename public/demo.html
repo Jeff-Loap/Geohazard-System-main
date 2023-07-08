@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat with OpenAI</title>
+  <style>
+    #chatbox {
+      width: 300px;
+      height: 400px;
+      border: 1px solid black;
+      overflow: auto;
+    }
+    #userInput {
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chatbox"></div>
+  <br/>
+  <input id="userInput" type="text" placeholder="Type your message here">
+  <button id="sendButton">Send</button>
+  <select id="apiVersion">
+    <option value="3.5">Turbo 3.5</option>
+    <option value="4.0">Turbo 4.0</option>
+  </select>
+  <script>
+   // client.js
+
+document.getElementById("sendButton").addEventListener("click", function() {
+  var userMessage = document.getElementById("userInput").value;
+  var apiVersion = document.getElementById("apiVersion").value;
+  var chatbox = document.getElementById("chatbox");
+  
+  chatbox.innerHTML += "You: " + userMessage + "<br/>";
+
+  fetch("/api/completion", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: userMessage, apiVersion: apiVersion })
+  })
+  .then(response => response.json())
+  .then(data => {
+    chatbox.innerHTML += "Bot: " + data.botMessage + "<br/>";
+    chatbox.scrollTop = chatbox.scrollHeight;
+  })
+  .catch(error => console.error('Error:', error));
+
+  document.getElementById("userInput").value = "";
+});
+
+  </script>
+</body>
+</html>

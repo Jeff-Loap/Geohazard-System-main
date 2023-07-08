@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Johor Flood</title>
+        <style>
+            body { margin: 0; }
+            canvas { display: block; }
+            #slider, #toggleButton, #rainfallTimeInput {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: 250px;
+            }
+            #toggleButton {
+                top: 50px;
+            }
+            #waterLevelLabel {
+    position: absolute;
+    top: 10px;
+    left: 270px;
+    width: 100px;
+    color: rgb(255, 255, 255); /* 蓝色 */
+    font-size: 20px; /* 字体大小 */
+    font-family: 'Courier New', Courier, monospace; /* 等宽字体 */
+    font-weight: bold;
+}
+
+#rainfallTimeLabel {
+    position: absolute;
+    top: 10px;
+    left: 520px;
+    width: 100px;
+    color: rgb(250, 250, 250); /* 蓝色 */
+    font-size: 20px; /* 字体大小 */
+    font-family: 'Courier New', Courier, monospace; /* 等宽字体 */
+    font-weight: bold;
+}
+
+            #rainfallTimeInput {
+                position: absolute;
+                top: 10px;
+                left: 650px;
+                width: 100px;
+            }
+            #rainfallTimeLabel, #rainfallTimeInput {
+    display: none;
+}
+
+        </style>
+    </head>
+    <body>
+        <input type="range" min="0" max="250" value="0" id="slider" style="display: none;">
+        <!-- Change rainfall label to water level label -->
+        <span id="waterLevelLabel">Water Level（m）: 0</span>
+        <button id="toggleButton">Switch to manual simulation</button>
+
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/build/three.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/loaders/GLTFLoader.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/loaders/TextureLoader.js"></script>
+        <span id="rainfallTimeLabel">Rainfall time（h）: 0</span>
+        <input type="number" min="0" value="0" id="rainfallTimeInput">
+
+        <script>
+            var scene, camera, renderer, controls;
+            var mixer, action, slider, rainfallLabel, rainfallTimeInput;
+            var totalFrames = 250; // total frames
+            var manualMode = false; // set the default mode to automatic
+            var animationSpeed = 0.01; // the speed of the animation when in automatic mode
+
+            init();
+            animate();
+
+            function init() {
+                slider = document.getElementById('slider');
+                rainfallLabel = document.getElementById('rainfallLabel');
+                rainfallTimeInput = document.getElementById('rainfallTimeInput');
+                console.log(localStorage.getItem('rainfallAmount')); // Should log the value set in the first page
+                let rainfallAmount = Number(localStorage.getItem('rainfallAmount')) || 0; // Retrieve from localStorage
+
+  let endFrame = Math.min(rainfallAmount, 250);  // Ensure it's no more than 250
+  var rainfallTimeInput = document.getElementById('rainfallTimeInput');
+            var rainfallTimeLabel = document.getElementById('rainfallTimeLabel');
+            let rainfallTime = Number(localStorage.getItem('rainfallTime')) || 0;
+
+            rainfallTimeInput.addEventListener('input', function() {
+                rainfallTime = Number(rainfallTimeInput.value);
+                localStorage.setItem('rainfallTime', rainfallTime);
+                rainfallTimeLabel.innerText = 'Rainfall time（h）: ' + rainfallTime;
+                updateWaterLevel();
+            });
+            //let waterlevel = Number(localStorage.getItem('waterlevel')) || 0;
+            /* Modify the slider's input event to also update the water level */
+  slider.addEventListener('input', function() {
+    if (action) {
+      action.time = Math.min(slider.value, endFrame) / totalFrames * action._clip.duration;
+    }
+    rainfallLabel.innerText = 'Rainfall（mm）: ' + slider.value; // update rainfall label
+    updateWaterLevel();  
+});
+                var toggleButton = document.getElementById('toggleButton');
+toggleButton.addEventListener('click', function() {
+    manualMode = !manualMode; // toggle the mode
+    if(manualMode){
+        this.innerText = 'Switch to automatic simulation';
+        slider.style.display = 'block'; // show the slider
+        /* Show the rainfallTime elements */
+        rainfallTimeInput.style.display = 'block';
+        rainfallTimeLabel.style.display = 'block';
+        if (action) {
+            action.paused = true;
+            action.time = 0; // reset the animation
+            slider.value = 0; // reset the slider
+        }
+    }
+    else{
+        this.innerText = 'Switch to manual simulation';
+        slider.style.display = 'none'; // hide the slider
+        /* Hide the rainfallTime elements */
+        rainfallTimeInput.style.display = 'none';
+        rainfallTimeLabel.style.display = 'none';
+        if (action) {
+            action.paused = false; // restart the animation
+        }
+    }
+});
+
+let currentFrame = 0;
+
+/* Function to calculate and update the water level */
+function updateWaterLevel() {
+    let rainfallAmount = Number(localStorage.getItem('rainfallAmount')) || 0;
+    let rainfallTime = Number(localStorage.getItem('rainfallTime')) || 0;
+    rainfallTime = Math.min(rainfallTime, 100);
+    let totalRainfall = rainfallAmount * rainfallTime;
+    let coefficient = 3.3 / 100;
+    let estimatedWaterLevel = coefficient * Math.sqrt(totalRainfall);
+    /* Update the water level label */
+    waterLevelLabel.innerText = 'Water Level（m）: ' + estimatedWaterLevel.toFixed(2);
+    /* Scale the water level to the frame count. 5 meters corresponds to 250 frames. */
+    let estimatedEndFrame = estimatedWaterLevel * 50;
+    /* If the estimated end frame is greater than 250, set it to 250 */
+    let endFrame = estimatedEndFrame > 250 ? 250 : estimatedEndFrame;
+    /* Increase currentFrame by 1, but do not exceed endFrame */
+    currentFrame = Math.min(currentFrame + 1, endFrame);
+    /* Set the animation time based on the current frame */
+    action.time = currentFrame / totalFrames * action._clip.duration;
+}
+
+/* Set an interval to update the water level every second */
+setInterval(updateWaterLevel, 20);
+
+                scene = new THREE.Scene();
+
+// Create a texture loader
+var loader = new THREE.TextureLoader();
+
+// Load the image and set it as the scene background
+loader.load('柔佛.png', function(texture) {
+    scene.background = texture;
+});
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0xdddddd);
+
+                camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 100000);
+                camera.position.set(500, 10000, 3000);
+
+                renderer = new THREE.WebGLRenderer({ antialias: true });  //创建一个THREE.WebGLRenderer实例，用于在浏览器中渲染3D图形
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setClearColor(0xEEEEEE);
+                document.body.appendChild(renderer.domElement);
+
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+                var ambientLight = new THREE.AmbientLight(0xcccccc, 2);
+                scene.add(ambientLight);
+
+                var directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+                directionalLight.position.set(0, 1, 1).normalize();
+                scene.add(directionalLight);
+
+                var loader = new THREE.GLTFLoader();
+loader.load('柔佛洪灾.glb', function(gltf){
+    car = gltf.scene.children[0];
+    car.scale.set(0.5, 0.5, 0.5);
+    scene.add(gltf.scene);
+
+    mixer = new THREE.AnimationMixer(gltf.scene);
+    action = mixer.clipAction(gltf.animations[0]);
+    action.setLoop(THREE.LoopRepeat);
+    action.play();
+
+    // Set the animation time based on the rainfall amount
+    let rainfallAmount = Number(localStorage.getItem('rainfallAmount')) || 0; // Retrieve from localStorage
+    let endFrame = Math.min(rainfallAmount, 250);  // Ensure it's no more than 250
+    action.time = endFrame / totalFrames * action._clip.duration;
+});
+            }
+            function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene,camera);  // 场景中渲染对象
+
+    let rainfallAmount = Number(localStorage.getItem('rainfallAmount')) || 0; // Retrieve from localStorage
+    let endFrame = Math.min(rainfallAmount, 250);  // Ensure it's no more than 250
+
+    let manualEndFrame = 250; // 手动模式的结束帧设为250
+
+if (mixer) {
+    if (manualMode) {
+        // 检查是否已经达到手动模式的结束帧
+        if (action.time / action._clip.duration * totalFrames < manualEndFrame) {
+            mixer.update(0); // 在手动模式下，不会推进动画
+            slider.value = action.time / action._clip.duration * totalFrames; // 将滑动条与动画同步
+            rainfallLabel.innerText = 'Rainfall（mm）: ' + slider.value; // 更新降雨标签
+        } else {
+            // 如果已经到达手动模式的结束帧，重置动画
+            action.time = 0;
+            slider.value = 0;
+        }
+    } else {
+        // 在自动模式下，推进动画直到达到endFrame
+        if (action.time / action._clip.duration * totalFrames < endFrame) {
+            mixer.update(animationSpeed); // 继续动画
+            slider.value = action.time / action._clip.duration * totalFrames; // 将滑动条与动画同步
+            rainfallLabel.innerText = 'Rainfall（mm）: ' + slider.value; // 更新降雨标签
+        } else {
+            // 如果已经到达自动模式的结束帧，重置动画
+            action.time = 0;
+            slider.value = 0;
+        }
+    }
+}
+
+}
+
+        </script>
+    </body>
+</html>

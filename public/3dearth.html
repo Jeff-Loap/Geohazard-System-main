@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>3D Earth</title>
+        <script src="https://cesium.com/downloads/cesiumjs/releases/1.86/Build/Cesium/Cesium.js"></script>
+    
+        <style>
+            @import url('https://cesium.com/downloads/cesiumjs/releases/1.86/Build/Cesium/Widgets/widgets.css');
+    
+            html, body, #cesiumContainer {
+                width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+            }
+        </style>
+    </head>
+<body>
+    
+    <div id="cesiumContainer"></div>
+    <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMmIwYmQxYi05Y2E3LTRkZmYtOTFkMy1iODBkNzE1OTc1YzEiLCJpZCI6MTQzMTY5LCJpYXQiOjE2ODU1MzM4Mjd9.TkpOV1rdA9dv87uDF9102Jmwl07M-TsU3U9LweQ_UnE';
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    </script>
+</body>
+</html>

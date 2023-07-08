@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>About Us</title>
+	<link rel="stylesheet" type="text/css" href="about.css">
+  <link rel="icon" href="geologo.ico">
+</head>
+<body>
+	<header>
+		<h1>About Us</h1>
+    <div class="home-button">
+      <a href="/loginhome">Home</a>
+    </div>
+	</header>
+	<main>
+		<section>
+			<h2>Our Story</h2>
+			<p>Geological disasters can pose a serious threat to people traveling to unfamiliar areas. At our team, we are dedicated to making it easier for people to understand and prepare for these potential risks.
+
+                Our team of experts is passionate about using technology to empower people and keep them safe while they explore the world. We have a deep understanding of geology and natural disasters, as well as extensive experience in developing software solutions for a variety of applications.
+                
+                We are committed to providing accurate, up-to-date information on geological risks in areas around the world. Our system uses the latest data and advanced algorithms to analyze geological activity and predict potential disasters. With our system, travelers can easily access information on potential risks in the areas they plan to visit, allowing them to make informed decisions and take appropriate precautions.
+                
+                We believe that everyone should be able to travel safely and with confidence, no matter where they go. That's why we are dedicated to developing innovative solutions that help people understand and prepare for potential risks, and empower them to explore the world with confidence.</p>
+		</section>
+		<section>
+            <h2>Our Team</h2>
+            <ul class="team-members">
+                
+                    <div class="member">
+                        <img src="he.png" alt="Person 1">
+                        <h3>He Yulin</h3>
+                    </div>
+               
+               
+                    <div class="member">
+                        <img src="yang.jpg" alt="Person 2">
+                        <h3>Yang Shuxian</h3>
+                    </div>
+                
+               
+                    <div class="member">
+                        <img src="tang.jpg" alt="Person 3">
+                        <h3>Tang Ziheng</h3>
+                    </div>
+               
+            </ul>
+        </section>
+        
+        
+        
+	</main>
+	<footer>
+		<p>&copy; 2023 Geohazard System</p>
+	</footer>
+    <script>
+        // Get all the team member li elements
+const teamMembers = document.querySelectorAll('section:nth-of-type(2) li');
+
+// Initialize the slide index
+let slideIndex = 0;
+
+// Show the first slide
+showSlide(slideIndex);
+
+// Set an interval to automatically switch slides every 5 seconds
+setInterval(() => {
+  slideIndex++;
+  if (slideIndex >= teamMembers.length) {
+    slideIndex = 0;
+  }
+  showSlide(slideIndex);
+}, 5000);
+
+// Function to show a specific slide
+function showSlide(index) {
+  // Hide all slides
+  teamMembers.forEach(member => {
+    member.style.display = 'none';
+  });
+  // Show the specified slide
+  teamMembers[index].style.display = 'block';
+}
+    </script>
+</body>
+</html>

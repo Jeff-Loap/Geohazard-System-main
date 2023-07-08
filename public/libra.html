@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>10years_info Table</title>
+  <style>
+    table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#searchInput {
+  margin-right: 8px;
+}
+
+#searchBtn {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 6px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+h1 {
+  text-align: center;
+  font-size: 36px;
+  margin: 24px 0;
+}
+
+@media (max-width: 768px) {
+  table {
+    font-size: 14px;
+  }
+}
+.filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.filter label {
+  margin-right: 10px;
+}
+
+select {
+  padding: 8px;
+  border-radius: 4px;
+}
+  </style>
+</head>
+
+<body>
+  <h1>Global disasters in the past decade</h1>
+
+  <div class="filter">
+    <label for="yearSelect">Year:</label>
+    <select id="yearSelect"></select>
+
+    <label for="typeSelect">Disaster Type:</label>
+    <select id="typeSelect"></select>
+
+    <label for="countrySelect">Country:</label>
+    <select id="countrySelect"></select>
+  </div>
+
+  <table id="rejiTable">
+    <thead>
+      <tr>
+        <th>Start Year</th>
+        <th>Start Month</th>
+        <th>Start Day</th>
+        <th>End Year</th>
+        <th>End Month</th>
+        <th>End Day</th>
+        <th>Country</th>
+        <th>Disaster Type</th>
+        <th>Disaster Subtype</th>
+        <th>Region</th>
+        <th>Continent</th>
+        <th>Location</th>
+        <th>Origin</th>
+        <th>latitude</th>
+        <th>Longitude</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script>
+  $(document).ready(function () {
+  // 从后端获取数据并显示在表格中
+  $.getJSON('http://127.0.0.1:3000/10years_info', function (data) {
+    console.log(data);
+    var rows = '';
+    $.each(data, function (i, item) {
+      rows += '<tr>';
+      rows += '<td>' + item["Start_Year"] + '</td>';
+      rows += '<td>' + item["Start_Month"] + '</td>';
+      rows += '<td>' + item["Start_Day"] + '</td>';
+      rows += '<td>' + item["End_Year"] + '</td>';
+      rows += '<td>' + item["End_Month"] + '</td>';
+      rows += '<td>' + item["End_Day"] + '</td>';
+      rows += '<td>' + item["Country"] + '</td>';
+      rows += '<td>' + item["Disaster_Type"] + '</td>';
+      rows += '<td>' + item["Disaster_Subtype"] + '</td>';
+      rows += '<td>' + item["Region"] + '</td>';
+      rows += '<td>' + item["Continent"] + '</td>';
+      rows += '<td>' + item["Location"] + '</td>';
+      rows += '<td>' + item["Origin"] + '</td>';
+      rows += '<td>' + item["latitude"] + '</td>';
+      rows += '<td>' + item["Longitude"] + '</td>';
+      rows += '</tr>';
+    });
+    $('#rejiTable tbody').html(rows);
+
+  
+    // Populate year and type dropdowns
+    var uniqueYears = [...new Set(data.map(item => item.Start_Year))].sort().reverse();
+    var uniqueTypes = [...new Set(data.map(item => item.Disaster_Type))].sort();
+    var uniqueCountries = [...new Set(data.map(item => item.Country))].sort();
+
+    var yearSelect = $('#yearSelect');
+    var typeSelect = $('#typeSelect');
+    var countrySelect = $('#countrySelect');
+
+    // Add an "All" option to both dropdowns
+    yearSelect.append('<option value="All">All</option>');
+    typeSelect.append('<option value="All">All</option>');
+    countrySelect.append('<option value="All">All</option>')
+
+    // Populate year dropdown
+    $.each(uniqueYears, function (i, year) {
+      yearSelect.append('<option value="' + year + '">' + year + '</option>');
+    });
+
+    // Populate type dropdown
+    $.each(uniqueTypes, function (i, type) {
+      typeSelect.append('<option value="' + type + '">' + type + '</option>');
+    });
+
+    // Populate type dropdown
+    $.each(uniqueCountries, function(i, country) {
+          countrySelect.append('<option value="' + country + '">' + country + '</option>');
+        });
+
+    // Filter table based on dropdown selections
+    $('#yearSelect, #typeSelect,#countrySelect').change(function () {
+      var selectedYear = $('#yearSelect').val();
+      var selectedType = $('#typeSelect').val();
+      var selectedCountry = $('#countrySelect').val();
+
+      var filteredData = data.filter(function (item) {
+        if ((selectedYear === "All" || item.Start_Year === selectedYear) &&
+          (selectedType === "All" || item.Disaster_Type === selectedType) &&
+          (selectedCountry === "All" || item.Country === selectedCountry))  {
+          return true;
+        } else {
+          return false;
+        }
+      });
+
+      var rows = '';
+      $.each(filteredData, function (i, item) {
+        rows += '<tr>';
+        rows += '<td>' + item["Start_Year"] + '</td>';
+        rows += '<td>' + item["Start_Month"] + '</td>';
+        rows += '<td>' + item["Start_Day"] + '</td>';
+        rows += '<td>' + item["End_Year"] + '</td>';
+        rows += '<td>' + item["End_Month"] + '</td>';
+        rows += '<td>' + item["End_Day"] + '</td>';
+        rows += '<td>' + item["Country"] + '</td>';
+        rows += '<td>' + item["Disaster_Type"] + '</td>';
+        rows += '<td>' + item["Disaster_Subtype"] + '</td>';
+        rows += '<td>' + item["Region"] + '</td>';
+        rows += '<td>' + item["Continent"] + '</td>';
+        rows += '<td>' + item["Location"] + '</td>';
+        rows += '<td>' + item["Origin"] + '</td>';
+        rows += '<td>' + item["latitude"] + '</td>';
+        rows += '<td>' + item["Longitude"] + '</td>';
+        rows += '</tr>';
+      });
+      $('#rejiTable tbody').html(rows);
+    });
+  });
+});
+</script>
+
+
+</body>
+
+</html>

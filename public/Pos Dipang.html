@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pos Dipang</title>
+        <style>
+            body {
+                margin: 0;
+                position: relative;
+            }
+            #inputContainer {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                display: flex;
+                align-items: center;
+            }
+            #rainfallLabel {
+                color: white;
+                margin-right: 10px;
+            }
+            #toggleButton {
+                margin-left: 10px; /* Add left margin for spacing */
+            }
+        </style>
+    </head>
+    <body>
+        <div id="inputContainer">
+            <label for="rainfallTimeInput" id="rainfallLabel">Rainfall（mm）:</label>
+            <input type="number" min="0" max="250" value="0" id="rainfallTimeInput">
+            <button id="toggleButton">Simulation</button>
+            <button id="stopButton" disabled>Stop</button>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/build/three.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/loaders/GLTFLoader.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/loaders/TextureLoader.js"></script>
+
+        <script>
+            var scene, camera, renderer, controls;
+            var mixer, actions, rainfallTimeInput, stopButton;
+            var totalFrames = 250; // 总帧数
+            var manualMode = true; // 默认为手动模式
+            var animationSpeed = 0.0002; // 自动模式下的动画速度
+    
+            init();
+    
+            document.getElementById('toggleButton').addEventListener('click', function() {
+                manualMode = !manualMode; // 切换模式
+                if (manualMode) {
+                    this.innerText = 'Simulation';
+                    rainfallTimeInput.disabled = true;
+                    stopButton.disabled = true;
+                } else {
+                    this.innerText = 'Simulation';
+                    rainfallTimeInput.disabled = false;
+                    stopButton.disabled = false;
+                    updateAnimation();
+                }
+            });
+    
+            document.getElementById('stopButton').addEventListener('click', function() {
+                manualMode = true; // 切换到手动模式
+                rainfallTimeInput.disabled = false;
+                stopButton.disabled = true;
+                updateAnimation();
+            });
+    
+            function init() {
+                rainfallTimeInput = document.getElementById('rainfallTimeInput');
+                stopButton = document.getElementById('stopButton');
+    
+                scene = new THREE.Scene();
+                var textureLoader = new THREE.TextureLoader();
+                var backgroundTexture = textureLoader.load('Pos Dipang.png');
+                scene.background = backgroundTexture;
+    
+                camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100000);
+                camera.position.set(0, 0, 5);
+    
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setClearColor(0xEEEEEE);
+                document.body.appendChild(renderer.domElement);
+    
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+    
+                var ambientLight = new THREE.AmbientLight(0xcccccc, 2);
+                scene.add(ambientLight);
+    
+                var directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+                directionalLight.position.set(0, 1, 1).normalize();
+                scene.add(directionalLight);
+    
+                var loader = new THREE.GLTFLoader();
+                loader.load('Pos Dipang.gltf', function(gltf) {
+                    scene.add(gltf.scene);
+                     // 计算模型的中心位置
+                    const boundingBox = new THREE.Box3().setFromObject(gltf.scene);
+                    const center = boundingBox.getCenter(new THREE.Vector3());
+    
+                    // 将相机位置设置为模型的中心位置
+                    camera.position.copy(center);
+                    camera.position.z += boundingBox.getSize(new THREE.Vector3()).length();
+
+                    gltf.scene.rotation.y = Math.PI;
+    
+    
+                    mixer = new THREE.AnimationMixer(gltf.scene);
+                    actions = [];
+    
+                    for (let i = 0; i < gltf.animations.length; i++) {
+                        let action = mixer.clipAction(gltf.animations[i]);
+                        action.setLoop(THREE.LoopRepeat);
+                        action.play();
+                        actions.push(action);
+                    }
+    
+                    if (!manualMode) {
+                        updateAnimation();
+                    }
+                });
+            }
+    
+            function updateAnimation() {
+                let rainfallAmount = Number(rainfallTimeInput.value) || 0; // 从输入框获取降雨量
+                localStorage.setItem('rainfallAmount', rainfallAmount); // 将降雨量存储到本地
+    
+                let endFrame = Math.min(rainfallAmount, 250); // 确保不超过最大帧数
+    
+                for (let i = 0; i < actions.length; i++) {
+                    let action = actions[i];
+    
+                    if (manualMode) {
+                        action.paused = true;
+                        action.time = 0; // 重置动画
+                    } else {
+                        action.paused = false; // 重新开始动画
+                        action.time = endFrame / totalFrames * action._clip.duration;
+                    }
+                }
+            }
+    
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+    
+                if (mixer && !manualMode) {
+                    let rainfallAmount = Number(rainfallTimeInput.value) || 0; // 从输入框获取降雨量
+                    localStorage.setItem('rainfallAmount', rainfallAmount); // 将降雨量存储到本地
+    
+                    let endFrame = Math.min(rainfallAmount, 250); // 确保不超过最大帧数
+    
+                    for (let i = 0; i < actions.length; i++) {
+                        let action = actions[i];
+    
+                        if (action.time / action._clip.duration * totalFrames < endFrame) {
+                            mixer.update(animationSpeed); // 继续动画
+                        } else {
+                            // 如果已经到达自动模式的结束帧，重置动画
+                            action.time = 0;
+                        }
+                    }
+                }
+            }
+            animate();
+        </script>
+    </body>
+    

@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="icon" type="geologo/png" href="/geologo.png">
+  <script src="https://unpkg.com/xlsx@0.17.4/dist/xlsx.full.min.js"></script>
+  <script src="/loginhome.js"></script>
+  <link rel="stylesheet" type="text/css" href="/loginhome.css">
+  <meta charset="UTF-8">
+  <!-- 引用jQuery库 -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 引用Bootstrap 5的CSS文件 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
+  <!-- 引用Bootstrap 5的JavaScript文件 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <!-- 引用Bootstrap 4 JS文件 -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/2.4.0/Control.FullScreen.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/2.4.0/Control.FullScreen.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/mint-ui/lib/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/micromodal/dist/micromodal.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <img src="/geologo.png" alt="Logo" />
+    </div>
+    <div class="d2">
+      Geohazard System
+    </div>
+    <div class="cat">
+      <button class="lline" id="toggleDropdown">Geo Info &#9660;</button>
+      <div class="button-container" id="buttonContainer">
+        <div class="menu-items">
+          <button class="dropdown" id="geologicalDisasterBtn">
+            Geo Data
+            <div class="dropdownDA-content" id="geologicalDisasterContent"></div>
+          </button>
+          <button class="dropdown1 button-custom" id="geologicalDisasterBtn">
+            Geo Type
+            <div class="dropdown-content">
+              <label><input type="checkbox" name="Flood" value="Flood">Flood</label>
+              <label><input type="checkbox" name="Landslide" value="Landslide">Landslide</label>
+            </div>
+          </button>
+          <button class="dropdown2 button-custom">
+            Region
+            <div class="dropdown-content">
+            </div>
+          </button>
+          <button class="btn btn-primary dropdown-toggle prediction-flood" type="button" id="regionButton"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Prediction(Flood)
+          </button>
+          <div class="dropdown-menu" aria-labelledby="regionButton">
+            <button class="dropdown-item" onclick="showPrompt('吉兰丹')">Kelantan</button>
+            <button class="dropdown-item" onclick="showPrompt('柔佛')">Johor</button>
+            <button class="dropdown-item" onclick="showPrompt('马六甲')">Melaka</button>
+          </div>
+          <button class="dropdown" id="tt" onclick="openLandslide('Pos Dipang.html')">Pos Dipang(Landslide)</button>
+          <button class="dropdown" id="tt" onclick="openLandslide('Genting Highlands.html')">Genting Highlands(Landslide)</button>
+          <button class="dropdown" id="tt" onclick="openLandslide('Simunjan District.html')">Simunjan district(Landslide)</button>
+          <button class="dropdown" id="geologicalDisasterBtn" onclick="openLibraPage()">10y_Info</button>
+        </div>
+      </div>
+    </div>
+    <button class="lline" onclick="goToaboutPage()">
+      About Us
+    </button>
+    <button class="lline" onclick="goTo3dPage()">
+      3D Earth(Pure earth)
+    </button>
+    <button class="lline" id="toggle_chart_button">Toggle Chart</button>
+    <div id="chart_div"
+      style="position: absolute; top: 160%; left: 10%; width: 80%; height: 800%; display: none; z-index: 11111"></div>
+    <script>
+      function openLibraPage() {
+        window.open("libra.html");
+      }
+    </script>
+    <script>
+      function openLandslide(pageURL) {
+        window.open(pageURL);
+      }
+    </script>
+    <script>
+      // 加载Google Charts库
+      google.charts.load('current', { 'packages': ['corechart'] });
+
+      // 设置加载完成后要运行的回调函数
+      google.charts.setOnLoadCallback(drawChart);
+
+      // 定义回调函数
+      function drawChart() {
+        // 读取Excel文件
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/times_country.xlsx', true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function (e) {
+          const data = new Uint8Array(xhr.response);
+          const workbook = XLSX.read(data, { type: 'array' });
+
+          // 获取第一个工作表中的数据
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const chartData = [['Country', 'Times']];
+
+          // 将数据保存到一个数组中
+          for (let i = 2; i <= 11; i++) {
+            const country = worksheet[`A${i}`].v;
+            const times = worksheet[`B${i}`].v;
+            chartData.push([country, times]);
+          }
+          // 将数据转换为DataTable格式
+          const dataTable = google.visualization.arrayToDataTable(chartData);
+          // 配置折线图选项
+          const options = {
+            title: '#Countries with geological disasters in the past ten years#',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+          };
+
+          // 创建折线图实例并绘制
+          const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          chart.draw(dataTable, options);
+        };
+        xhr.send();
+      }
+
+      // 当按钮被点击时，显示或隐藏折线图
+      document.getElementById('toggle_chart_button').addEventListener('click', function () {
+        const chartDiv = document.getElementById('chart_div');
+        if (chartDiv.style.display === 'none') {
+          chartDiv.style.display = 'block';
+          // 添加一个短暂的延迟，确保#chart_div的大小已经完全设置好
+          setTimeout(drawChart, 100);
+        } else {
+          chartDiv.style.display = 'none';
+        }
+      });
+    </script>
+    <div class="mergin"></div>
+    <div id="search-results"></div>
+    <ul id="landmark-list"></ul>
+    <form class="form1">
+      <input type="text" placeholder="Type the title here....">
+      <button type="submit">Go</button>
+    </form>
+    <script>
+      $(document).ready(function () {
+        $("#toggleDropdown").click(function () {
+          $("#buttonContainer").toggle();
+        });
+      });
+    </script>
+    <script>
+      // 获取展示新闻的容器元素
+      const container = document.getElementById('geologicalDisasterContent');
+
+      // 发送fetch请求
+      fetch('/news.xlsx')
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => {
+          // 读取Excel文件数据
+          const data = new Uint8Array(arrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          const placeholder = document.createElement('div');
+
+
+
+          // 填充新闻数据
+          rows.forEach((row) => {
+            const time = row[0];
+            const location = row[1];
+            const disaster = row[2];
+            const url = row[3];
+            const item = document.createElement('div');
+            item.classList.add('geologicalDisasterItem');
+            const text = document.createElement('p');
+            text.classList.add('geologicalDisasterText');
+            text.innerHTML = `
+  <span class="geologicalDisasterPlaceholder1">${time}</span>
+  <span class="geologicalDisasterPlaceholder">${location}</span>
+  <span class="geologicalDisasterPlaceholder">${disaster}</span>
+  <a href="${url || '#'}" target="_blank">${url ? 'Click to view information source' : '-'}</a>
+`;
+
+
+            item.appendChild(text);
+            container.appendChild(item);
+          });
+        })
+        .catch((error) => console.error(error));
+    </script>
+
+
+
+
+    <script>
+
+      function goToaboutPage() {
+        window.location.href = "about.html";
+      }
+      function goTo3dPage() {
+        window.open('3dearth.html', '_blank');
+      }
+    </script>
+    <button id="contactButton" class="contactus" onclick="goTocontactPage()">
+      Contact Us
+    </button>
+    <script>
+      function goTocontactPage() {
+        window.location.href = "contact.html";
+      }
+    </script>
+    <script>
+      function displayButtonsBasedOnLoginStatus() {
+        const accountButton = document.querySelector(".account");
+        const editProfileButton = document.querySelector(".edit");
+        const username = localStorage.getItem("username");
+
+        if (username === '<%= user.username %>') {
+          accountButton.style.display = "block";
+          editProfileButton.style.display = "none";
+        } else {
+          accountButton.style.display = "none";
+          editProfileButton.style.display = "block";
+
+
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", displayButtonsBasedOnLoginStatus);
+
+
+    </script>
+    <button class="account" onclick="goToLoginPage()">
+      Account
+    </button>
+    <script>
+      function goToLoginPage() {
+        window.location.href = "login.html";
+      }
+    </script>
+    <div class="container" style="position: absolute; left: 66%;">
+      <!-- Button to trigger modal -->
+      <button type="button" class="edit" data-toggle="modal" data-target="#profileModal" style="display: none;">
+        Edit Profile
+      </button>
+      <!-- Modal -->
+      <div class="modal fade" id="profileModal" tabloginhome="-1" role="dialog" aria-labelledby="profileModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" id="profileModalLabel">Edit Profile</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+              <!-- Form to edit user profile -->
+              <form>
+                <div class="form-group">
+                  <label for="profileUsername">Username</label>
+                  <input type="text" class="form-control" id="profileUsername" value="<%= user.username %>">
+
+                </div>
+                <div class="form-group">
+                  <label for="profileEmail">Email address</label>
+                  <input type="email" class="form-control" id="profileEmail" value="<%= user.email %> " readonly>
+                </div>
+                <div class="form-group">
+                  <label for="profilePassword">Password</label>
+                  <input type="text" class="form-control" id="profilePassword" value="<%= user.password %>">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" onclick="logOut()">Log out</button>
+              <button type="button" class="btn btn-primary" id="profileModal" onclick="updateUserInfo()">Save
+                changes</button>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    <script>
+      window.userData = {
+        username: '<%= user.username %>',
+      };
+      function updateUserInfo() {
+        const username = document.getElementById('profileUsername').value;
+        const email = document.getElementById('profileEmail').value;
+        const password = document.getElementById('profilePassword').value;
+
+        fetch(`/update_user_info?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, {
+          method: 'GET',
+        })
+          .then((response) => response.text())
+          .then((responseText) => {
+            if (responseText === 'success') {
+              alert('User information updated successfully.');
+              $('#profileModal').modal('hide');
+              userData.username = username;
+            } else if (responseText === 'username_taken') {
+              alert('Username is already taken.');
+            } else {
+              alert('An error occurred. Please try again.');
+            }
+          });
+      }
+
+      function logOut() {
+        // 发送 AJAX 请求到后端以清除 session
+        fetch('/logout', { method: 'GET' })
+          .then(() => {
+            // 重定向到 login.html 页面
+            window.location.href = '/login.html';
+          });
+      }
+    </script>
+
+
+    <!-- <div class="button-container">
+      <button class="dropdown" id="geologicalDisasterBtn">
+        Geo Data<div class="dropdownDA-content" id="geologicalDisasterContent">
+        </div>
+      </button> 
+    <script>
+            // 获取展示新闻的容器元素
+            const container = document.getElementById('geologicalDisasterContent');
+
+            // 发送fetch请求
+            fetch('/news.xlsx')
+              .then((response) => response.arrayBuffer())
+              .then((arrayBuffer) => {
+                // 读取Excel文件数据
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                const placeholder = document.createElement('div');
+
+
+
+                // 填充新闻数据
+                rows.forEach((row) => {
+                  const time = row[0];
+                  const location = row[1];
+                  const disaster = row[2];
+                  const url = row[3];
+                  const item = document.createElement('div');
+                  item.classList.add('geologicalDisasterItem');
+                  const text = document.createElement('p');
+                  text.classList.add('geologicalDisasterText');
+                  text.innerHTML = `
+  <span class="geologicalDisasterPlaceholder1">${time}</span>
+  <span class="geologicalDisasterPlaceholder">${location}</span>
+  <span class="geologicalDisasterPlaceholder">${disaster}</span>
+  <a href="${url || '#'}" target="_blank">${url ? 'Click to view information source' : '-'}</a>
+`;
+
+
+                  item.appendChild(text);
+                  container.appendChild(item);
+                });
+              })
+              .catch((error) => console.error(error));
+          </script>-->
+
+    <div class="dropdown mb-3">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="regionButton" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        Prediction(Flood)
+      </button>
+      <div class="dropdown-menu" aria-labelledby="regionButton">
+        <button class="dropdown-item" onclick="showPrompt('吉兰丹')">Kelantan</button>
+        <button class="dropdown-item" onclick="showPrompt('柔佛')">Johor</button>
+        <button class="dropdown-item" onclick="showPrompt('马六甲')">Melaka</button>
+      </div>
+    </div>
+
+    <div id="myModal">
+      <div class="modal-content">
+        <h4>Prediction</h4>
+        <form id="predictionForm">
+          <div class="form-group">
+            <label for="rainfall_amount">Please input rainfall (mm)/hour:</label>
+            <input type="number" class="form-control" id="rainfall_amount" required>
+          </div>
+          <div class="form-group">
+            <label for="rainfall_time">Please enter the rainfall time (hour):</label>
+            <input type="number" class="form-control" id="rainfall_time" required>
+          </div>
+          <div class="form-group">
+            <label for="water_level">Predicted water level:</label>
+            <input type="text" class="form-control" id="water_level" readonly>
+          </div>
+          <button type="submit" class="btn btn-primary">Calculate</button>
+          <button type="button" class="btn btn-secondary" id="view3DModelBtn" onclick="open3DModel()"
+            style="display: none;">View real terrain simulation</button>
+        </form>
+        <button type="button" class="btn btn-danger" id="testclose" onclick="closePrompt()">Close</button>
+      </div>
+    </div>
+
+    <script>
+      var selectedRegion = '';
+
+      function showPrompt(region) {
+        selectedRegion = region;
+        document.getElementById('myModal').style.display = 'block';
+      }
+
+      function closePrompt() {
+        document.getElementById('myModal').style.display = 'none';
+      }
+
+      document.getElementById('predictionForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        let rainfall_amount = document.getElementById('rainfall_amount').value;
+        let rainfall_time = document.getElementById('rainfall_time').value;
+        let water_level = calculateWaterLevel(rainfall_time, rainfall_amount);
+        document.getElementById('water_level').value = water_level + ' meter(s)';
+        document.getElementById('view3DModelBtn').style.display = 'block';
+      });
+
+      function open3DModel() {
+        if (selectedRegion === '吉兰丹') {
+          window.open('kelantan.html', '_blank');
+        } else if (selectedRegion === '柔佛') {
+          window.open('johor.html', '_blank');
+        } else if (selectedRegion === '马六甲') {
+          window.open('melaka.html', '_blank');
+        }
+      }
+
+      function calculateWaterLevel(rainfall_time, rainfall_amount_per_hour) {
+        let coefficient = 3.3 / 100;
+        // Since rainfall_amount is now per hour, it's already the intensity
+        let rainfall_intensity = rainfall_amount_per_hour;
+        let total_rainfall = rainfall_amount_per_hour * rainfall_time; // Total rainfall over the given time
+        let estimated_water_level = coefficient * Math.sqrt(total_rainfall);  // Use the square root of total rainfall
+        localStorage.setItem('rainfallTime', rainfall_time);  // Save total rainfall to localStorage
+        localStorage.setItem('rainfallAmount', rainfall_amount_per_hour);
+        localStorage.setItem('waterlevel', estimated_water_level);
+        console.log(localStorage.getItem('rainfallAmount')); // Should log the value of total rainfall
+        console.log(localStorage.getItem('rainfallTime'));
+        console.log(localStorage.getItem('waterlevel'));
+        return estimated_water_level;
+      }
+
+
+
+
+    </script>
+
+  </div>
+  </div>
+  <div class="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
+  <div id="map"></div>
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+    // Set the initial coordinates to Malaysia
+    var defaultCenter = [3.14, 101.68];
+    var defaultZoom = 13;
+
+    var lastAddedLandmarkLat = localStorage.getItem('lastAddedLandmarkLat');
+    var lastAddedLandmarkLng = localStorage.getItem('lastAddedLandmarkLng');
+
+    var center = defaultCenter;
+    if (lastAddedLandmarkLat && lastAddedLandmarkLng) {
+      center = [parseFloat(lastAddedLandmarkLat), parseFloat(lastAddedLandmarkLng)];
+
+      localStorage.removeItem('lastAddedLandmarkLat');
+      localStorage.removeItem('lastAddedLandmarkLng');
+    }
+
+    var map = L.map('map', { fullscreenControl: true }).setView(center, defaultZoom);
+    L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+      attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.',
+      maxZoom: 18,
+      subdomains: 'abcd'
+    }).addTo(map);
+
+    // New code for adding the icons on the map
+
+    var kelantanIcon = L.icon({
+      iconUrl: 'preflood.png',  // URL to the image file for the icon
+      iconSize: [38, 51], // size of the icon
+      iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var kelantanMarker = L.marker([6.127463, 102.242287], { icon: kelantanIcon }).addTo(map);
+    kelantanMarker.on('click', function () {
+      showPrompt('吉兰丹');
+    });
+
+    var johorIcon = L.icon({
+      iconUrl: 'preflood.png',  // URL to the image file for the icon
+      iconSize: [38, 51], // size of the icon
+      iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    window.johorClickHandler = function () {
+      showPrompt('柔佛');
+    };
+
+    var johorMarker = L.marker([1.527549, 103.745476], { icon: johorIcon }).addTo(map);
+    johorMarker.on('click', window.johorClickHandler);
+
+    var melakaIcon = L.icon({
+      iconUrl: 'preflood.png',  // URL to the image file for the icon
+      iconSize: [38, 51], // size of the icon
+      iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    var melakaMarker = L.marker([2.189568, 102.250116], { icon: melakaIcon }).addTo(map);
+    melakaMarker.on('click', function () {
+      showPrompt('马六甲');
+    });
+    var PosIcon = L.icon({
+      iconUrl: 'landslidet.png',  // URL to the image file for the icon
+      iconSize: [38, 51], // size of the icon
+      iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    var PosMarker = L.marker([4.3715547, 101.2472369], { icon: PosIcon }).addTo(map);
+    PosMarker.on('click', function () {
+      openLandslide('Pos Dipang.html');
+    });
+    var GentingIcon = L.icon({
+      iconUrl: 'landslidet.png',  // URL to the image file for the icon
+      iconSize: [38, 51], // size of the icon
+      iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    var GentingMarker = L.marker([3.1569486, 101.712303], { icon: GentingIcon }).addTo(map);
+    GentingMarker.on('click', function () {
+      openLandslide('Genting Highlands.html');
+    });
+    var SimIcon = L.icon({
+      iconUrl: 'landslidet.png',  // URL to the image file for the icon
+      iconSize: [38, 51], // size of the icon
+      iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    var SimMarker = L.marker([1.2405774, 110.6923232], { icon: SimIcon }).addTo(map);
+    SimMarker.on('click', function () {
+      openLandslide('Simunjan district.html');
+    });
+  </script>
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+    var markers = [];
+    //全局landmark
+    var landmarkIdCounter = 1;
+
+    function createPopupForm() {
+      return `
+    <form id="marker-form" enctype="multipart/FormData" style="width: 400px;">
+      <label for="title">Title:(Refresh the page after creation)</label><br>
+      <input type="text" id="title" name="title" required style="width: 100%;"><br>
+      <label for="content">Content:</label><br>
+      <textarea id="content" name="content" required style="width: 100%; height: 300px;"></textarea><br>
+      <label for="media">Media:</label><br>
+      <input type="file" id="media" name="media" accept="image/*"><br>
+      <button type="submit" class="save-button">Save</button>
+    </form>
+  `;
+    }
+
+
+
+    function addImagePopup(marker, latlng, mediaUrl) {
+      var imgPopup = L.popup()
+        .setLatLng(latlng)
+        .setContent(`<img src="${mediaUrl}" style="max-width: 400px; max-height: 400px;">`)
+        .openOn(map);
+
+      // 绑定新的弹出窗口到标记
+      marker.bindPopup(imgPopup);
+
+      // 当标记被点击时，关闭新的弹出窗口
+      marker.on('click', function () {
+        map.removeLayer(imgPopup);
+      });
+    }
+
+
+  </script>
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+    var username = userData.username;
+
+    function addMarker(latlng, title, content, username, time, landmarkId, comments, mediaUrl) {
+      var marker = L.marker(latlng).addTo(map);
+      marker.getElement().setAttribute('data-test', 'default-marker');
+      markers.push(marker);
+      var commentsHTML = '';
+      if (Array.isArray(comments)) {
+        comments.forEach((comment) => { //循环读取显示评论
+          commentsHTML += `
+      <div class="comments">
+        <strong>${comment.username}</strong> <em>${comment.time}</em> <button type="button" id="report-comment-${comment.commentid}" class="report-comment-btn">Report</button>
+        <p>${comment.content}</p>
+       
+      </div>`;
+        });
+      }
+
+      var commentsFormHTML = '';
+      if (userData && userData.username) {
+        commentsFormHTML = `
+  <form id="comments-form-${landmarkId}">
+  <label for="comments">Add a comment:(Refresh the page after comment)</label><br>
+  <textarea id="comments" name="comments" required class="comments-input" style="width:100%;height:100px;"/></textarea><br>
+  <button type="submit">Save</button>
+</form>
+    `;
+      }
+
+
+
+      // 显示地标信息.
+
+      // 定义一个函数来识别文本中的URL并将其转换为可点击的链接
+      function linkify(inputText) {
+        // 匹配URL的正则表达式
+        var urlPattern = /(https?:\/\/[^\s]+)/g;
+        // 将匹配到的URL替换为可点击的链接
+        return inputText.replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
+      }
+
+      // 将内容中的URL转换为可点击的链接
+      content = linkify(content);
+
+      var popupContent = `
+        <div class="popup-content">
+  <h2>${title}</h2>
+  <p>${content}</p>
+  <p><strong>Username:</strong> ${username}</p>
+  <p><strong>Created at:</strong> ${time}</p>
+  ${mediaUrl ? `<a href="#" class="image-link"><img src="${mediaUrl}" style="max-width: 300px; max-height: 300px;"></a>` : ''}
+
+  <div class="popup-content1 slide-in-left">
+    <h3>User Comments</h3>
+    ${commentsHTML}
+    ${commentsFormHTML}      
+  </div>
+  <button type="button" id="report-btn" class="report-btn">Report</button>
+  ${userData.username === 'admin' || userData.username === username ? '<button type="button" id="delete-btn" class="delete-btn">Delete</button>' : ''}
+</div>
+</div>
+
+  `;
+
+      //放大 mediaUrl 的图像----------------------------
+      function showImageModal(imageUrl) {
+        const modal = document.createElement('div');
+        modal.classList.add('image-modal');
+        modal.innerHTML = `
+    <div class="modal-content">
+      <img src="${imageUrl}" style="max-width: 90%; max-height: 90%;">
+    </div>
+  `;
+
+        modal.addEventListener('click', () => {
+          modal.remove();
+        });
+
+        document.body.appendChild(modal);
+      }
+      document.addEventListener('click', (event) => {
+        if (event.target.closest('.image-link')) {
+
+          const mediaUrl = event.target.closest('.image-link').querySelector('img').src;
+          showImageModal(mediaUrl);
+        }
+      });
+
+
+
+      marker.bindPopup(popupContent);
+      //管理员删除
+      map.on('popupopen', function (e) {
+        var deleteBtn = document.getElementById('delete-btn');
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', function () {
+            deleteLandmark(currentLandmarkId); // 将 currentLandmarkId 传递给 deleteLandmark 函数
+          });
+        }
+      });
+      function deleteLandmark(landmarkId) {
+        // 发送 AJAX 请求以删除指定的地标
+        fetch(`/delete-landmark/${landmarkId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+          .then((response) => {
+            console.log('delete successfully!');
+            location.reload(); // 在删除成功后重新加载页面
+          })
+          .catch((error) => {
+            console.error('Fetch error:', error);
+          });
+      }
+
+      // 评论功能
+      marker.on('popupopen', function () {
+        // 更新 currentLandmarkId
+        currentLandmarkId = landmarkId;
+        document.getElementById(`comments-form-${landmarkId}`).addEventListener('submit', function (event) {
+
+          var commentsContent = event.target.comments.value;
+          if (!commentsContent.trim()) {
+            return;
+          }
+          var formData = new FormData();
+          //评论引用
+          formData.append('content', commentsContent);
+          //日期格式
+          const localDate = new Date();
+          const utcDate = new Date(localDate.getTime() + localDate.getTimezoneOffset());
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          const localMoment = moment(utcDate).tz(timeZone);
+          const localDateString = localMoment.format('YYYY-MM-DD HH:mm:ss');
+
+
+          formData.append('time', localDateString);
+          // 创建 JSON 对象
+          const formData1 = {
+            content: commentsContent, // 使用提取的评论内容
+            time: localDateString,
+            landmarkid: landmarkId, // 添加landmarkId
+          };
+          //ajax,json传到后端
+          fetch('/add-comments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData1),
+          })
+            .then((response) => {
+              if (response.ok) {
+                console.log('comments added to database');
+                // 将经纬度和操作类型保存到 localStorage
+                const markerLatLng = marker.getLatLng();
+                localStorage.setItem('lastLatLng', JSON.stringify(markerLatLng));
+
+              } else {
+                console.error('Error adding comments to database');
+              }
+            })
+            .catch((error) => {
+              console.error('Fetch error:', error);
+              event.target.setCustomValidity('Error submitting the comments. Please try again.');
+            });
+          event.target.comments.value = '';
+        });
+      });
+    }
+    let mediaUrl = null;
+    let mediaUrlNew = null;
+    map.on('click', function (e) {
+      var closeMarker = markers.find(marker => marker.getLatLng().distanceTo(e.latlng) < 10);
+      var username = userData.username;
+      if (closeMarker) {
+        let landmarkId = closeMarker.landmarkId;
+
+        currentLandmarkId = landmarkId;
+
+        var popup = L.popup().setLatLng(e.latlng).setContent(createPopupForm(landmarkId)).openOn(map);
+        closeMarker.openPopup();
+      } else {
+        var popup = L.popup().setLatLng(e.latlng).setContent(createPopupForm()).openOn(map);
+        var markerForm = document.getElementById('marker-form');
+        markerForm.setAttribute('data-test', 'special-marker-form'); // 添加一个特殊的自定义属性
+        markerForm.addEventListener('submit', async function (event) {
+          event.preventDefault();
+          var title = document.getElementById('title').value;
+          var content = document.getElementById('content').value;
+          var media = document.getElementById('media').files[0];
+          // 将上传的文件转换为Base64字符串
+          const base64Image = await fileToBase64(media);
+
+
+
+          mediaUrl = media;
+          var formData = new FormData(event.target);
+          const localDate = new Date();
+          const utcDate = new Date(localDate.getTime() + localDate.getTimezoneOffset());
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          const localMoment = moment(utcDate).tz(timeZone);
+          const localDateString = localMoment.format('YYYY-MM-DD HH:mm:ss');
+          var landmarkId = landmarkIdCounter++;
+          // 将Base64字符串添加到表单数据中
+
+          formData.append('username', userData.username);
+          formData.append('time', localDateString);
+          formData.append('landmarkid', landmarkId);
+          formData.append('latitude', e.latlng.lat.toFixed(6));
+          formData.append('longitude', e.latlng.lng.toFixed(6));
+          formData.append('base64Image', base64Image);
+          mediaUrl = base64Image;
+          fetch('/add-landmark', {
+            method: 'POST',
+            body: formData,
+          })
+            .then((response) => {
+              if (response.ok) {
+                console.log('Landmark added to database');
+                localStorage.setItem('lastLatLng', JSON.stringify(e.latlng));
+                // 执行你希望在 fetch() 完成后进行的操作
+                // 例如，你可以刷新页面
+                location.reload();
+              } else {
+                console.error('Error adding landmark to database');
+              }
+            })
+            .catch((error) => {
+              console.error('Fetch error:', error);
+              event.target.setCustomValidity('Error submitting the comments. Please try again.');
+            });
+
+          // 将文件转换为Base64字符串的函数
+          function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = (error) => reject(error);
+            })
+          };
+          map.closePopup();
+        });
+      }
+    });
+
+    const lastLatLng1 = JSON.parse(localStorage.getItem('lastLatLng'));
+    if (lastLatLng1) {
+      map.setView([lastLatLng1.lat, lastLatLng1.lng], 12);
+      localStorage.removeItem('lastLatLng');
+    }
+
+  </script>
+  <script>
+    //举报功能
+    map.on('popupopen', function (e) {
+      var reportBtn = document.getElementById('report-btn');
+      if (reportBtn) {
+        reportBtn.addEventListener('click', function () {
+          map.closePopup(); // 关闭当前弹出窗口
+          reportFunction(currentLandmarkId); // 将 currentLandmarkId 传递给 reportFunction
+        });
+      }
+    });
+
+
+    function reportFunction(landmarkId) {
+      var reportPopupContent = `
+    <form id="report-form">
+      <label for="reason">Reason:</label>
+      <textarea id="reason" name="reason" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+  `;
+      var reportPopup = L.popup().setLatLng(map.getCenter()).setContent(reportPopupContent).openOn(map);
+
+      // 添加 submit 事件监听器
+      document.getElementById('report-form').addEventListener('submit', function (event) {
+
+        var reason = document.getElementById('reason').value;
+        // 创建表单数据对象
+        var formData = new FormData();
+        formData.append('username', userData.username);
+        formData.append('reason', reason);
+        formData.append('landmarkid', currentLandmarkId); // 使用传入的landmarkId参数
+        // 发送表单数据到后端
+        fetch('/report', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert('Report submitted successfully');
+              map.closePopup(reportPopup);
+            } else {
+              alert('Error submitting the report');
+            }
+          })
+          .catch((error) => {
+            console.error('Fetch error:', error);
+          });
+      });
+    }
+
+
+  </script>
+  <script>
+    //举报用户评论
+    map.on('popupopen', function (e) {
+      var commentReportButtons = document.querySelectorAll('.report-comment-btn');
+      commentReportButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var commentID = this.id.replace('report-comment-', ''); // 从按钮 id 中获取评论 ID
+          map.closePopup(); // 关闭当前弹出窗口
+          reportCommentFunction(commentID); // 将 commentID 传递给 reportCommentFunction
+        });
+      });
+    });
+
+    function reportCommentFunction(commentID) {
+      var reportPopupContent = `
+    <form id="report-comment-form">
+      <label for="reason">Reason:</label>
+      <textarea id="reason" name="reason" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+  `;
+      var reportPopup = L.popup().setLatLng(map.getCenter()).setContent(reportPopupContent).openOn(map);
+
+      document.getElementById('report-comment-form').addEventListener('submit', function (event) {
+        var reason = document.getElementById('reason').value;
+        var formData = new FormData();
+        formData.append('username', userData.username);
+        formData.append('reason', reason);
+        formData.append('commentid', commentID); // 使用传入的 commentID 参数
+
+        fetch('/commentreport', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert('Comment report submitted successfully');
+              map.closePopup(reportPopup);
+            } else {
+              alert('Error submitting the comment report');
+            }
+          })
+          .catch((error) => {
+            console.error('Fetch error:', error);
+          });
+      });
+    }
+
+  </script>
+
+  <script>
+
+    function loadLandmarks() {
+      fetch('/get-landmark')
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Error fetching landmarks');
+          }
+        })
+        .then((landmarksData) => {
+          console.log('Landmarks data received:', landmarksData);
+          landmarkIdCounter = landmarksData.maxLandmarkId + 1;
+
+          landmarksData.landmarks.forEach((landmark) => {
+            var latlng = L.latLng(landmark.latitude, landmark.longitude);
+            // 给图像添加点击事件监听器
+            const imageLinks = document.querySelectorAll('.image-link');
+            imageLinks.forEach((link) => {
+              link.addEventListener('click', (event) => {
+
+                showImageModal(mediaUrl);
+              })
+            })
+            // 使用获取到的地标数据，调用 addMarker 函数将地标添加到地图上。
+            addMarker(latlng, landmark.title, landmark.content, landmark.username, landmark.time, landmark.landmarkid, landmark.comments, landmark.base64Image);
+          })
+        })
+        .catch((error) => {
+          console.error('Fetch error:', error);
+          event.target.setCustomValidity('Error submitting the comments. Please try again.');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadLandmarks);
+    var lastLatLng = JSON.parse(localStorage.getItem('lastLatLng'));
+    if (lastLatLng) {
+      // 将地图定位到上次操作的地点
+      map.setView([lastLatLng.lat, lastLatLng.lng], 12);
+
+      // 从 localStorage 中移除信息
+      localStorage.removeItem('lastLatLng');
+    }
+  </script>
+  <!-- 上传图片测试用例 -->
+  <!-- <script>
+  let file = ''
+  let fileName = ''
+
+  function submit() {
+    let data = new FormData()
+    data.append('imgName', fileName)
+    data.append('image', file); // 更改这里的字段名称
+
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:3000',
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      timeout: 2000,
+      success: function (data) {
+        console.log(data)
+        loadImage() // 上传完成后加载图片
+      },
+      error: function (error) {
+        console.log(error)
+      }
+    });
+  }
+
+  function changeImg(e) {
+    file = e.target.files.item(0)
+    if (file === null) {
+      return
+    }
+    fileName = file.name
+  }
+
+  function loadImage() {
+  $.ajax({
+    type: 'GET',
+    url: 'http://localhost:3000',
+    cache: false,
+    timeout: 2000,
+    xhrFields: {
+      responseType: 'blob'
+    },
+    success: function (data) {
+      const blob = new Blob([data]);
+      const url = window.URL.createObjectURL(blob);
+      const img = document.getElementById('uploaded-image');
+      img.src = url;
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  });
+}
+  
+
+  // 页面加载时加载最新的图片
+  window.onload = function () {
+    loadImage()
+  }
+</script> -->
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+
+    // Read the Excel file and create markers on the map
+    var customIcon = L.icon({
+      iconUrl: '/flood.jpeg',
+      iconSize: [50, 50],
+      className: 'circle-border'
+    });
+
+    var url = "/flood.xlsx";
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
+    request.onload = function (e) {
+      var arraybuffer = request.response;
+
+      // Convert data to binary string
+      var data = new Uint8Array(arraybuffer);
+      var arr = new Array();
+      for (var i = 0; i != data.length; ++i) {
+        arr[i] = String.fromCharCode(data[i]);
+      }
+      var bstr = arr.join("");
+
+      // Read Excel file
+      var workbook = XLSX.read(bstr, {
+        type: "binary"
+      });
+
+      // Get first sheet and convert to JSON
+      var sheet_name_list = workbook.SheetNames;
+      var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+      // Create markers on the map
+      jsonData.forEach(function (row) {
+        var lat = row["Latitude"];
+        var lng = row["Longitude"];
+        var year = row["Year"];
+        var location1 = row["Location"];
+        var country1 = row["Country"];
+        var origin = row["Origin"];
+
+        // Replace this with the external video URL
+        var videoUrl;
+        if (lat === 5.980408 && lng === 116.0734568) {
+          videoUrl = "/johor.mp4";
+        }
+        else {
+          videoUrl = "/12.mp4";
+        }
+        // Create a popup with a video player
+        var popupContent = `
+                <div class="popup-content11">
+            <p ><strong>Flood Year:</strong> ${year}</p>
+            <p ><strong>Country:</strong> ${country1}</p>
+            <p ><strong>Origin:</strong> ${origin}</p>
+            <p ><strong>Location:</strong> ${location1}</p>
+            <p ><strong>Latitude:</strong> ${lat}</p>
+            <p ><strong>Longitude:</strong> ${lng}</p>
+            </div>
+            <video width="320" height="240" controls autoplay loop>
+                <source src="${videoUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+        var marker = L.marker([lat, lng], {
+          icon: customIcon,
+          category: "Flood"
+        }).bindPopup(popupContent).addTo(map);
+      });
+
+      /// Define the Flood checkbox element
+      var floodCheckbox = document.querySelector('input[name="Flood"]');
+      // Set the Flood checkbox to be checked by default
+      floodCheckbox.checked = true;
+      // Add a change event listener to the Flood checkbox
+      floodCheckbox.addEventListener('change', function () {
+        // Get all markers with the "Flood" category
+        map.eachLayer(function (layer) {
+          if (layer instanceof L.Marker && layer.options.category === "Flood") {
+            // Show or hide the markers based on the checkbox state
+            if (floodCheckbox.checked) {
+              layer.setOpacity(1);
+            } else {
+              layer.setOpacity(0);
+            }
+          }
+        });
+      });
+
+
+    };
+
+    request.send();
+
+  </script>
+
+
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+    // Trigger the modal when the Add button is clicked
+    var addButton1 = document.getElementById('add-button');
+    // Save the content when the Save button is clicked
+    function saveContent() {
+      // Get the title, content and image file from the form
+      var title = document.getElementById('add-modal-title').value;
+      var content = document.getElementById('add-modal-content').value;
+      var fileInput = document.getElementById('add-modal-image');
+      var imageFile = fileInput.files[0];
+
+      // Do something with the title, content and image file
+      // ...
+
+      // Close the modal after saving
+      addModal.hide();
+    }
+  </script>
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+    // Read the Excel file and create markers on the map
+    var landSlideIcon = L.icon({
+      iconUrl: '/landslide.jpeg',
+      iconSize: [50, 50],
+      className: 'circle-border'
+    });
+
+    var landSlideUrl = "/landslide.xlsx";
+    var landSlideReq = new XMLHttpRequest();
+    landSlideReq.open("GET", landSlideUrl, true);
+    landSlideReq.responseType = "arraybuffer";
+    landSlideReq.onload = function (e) {
+      var arraybuffer = landSlideReq.response;
+
+      // Convert data to binary string
+      var data = new Uint8Array(arraybuffer);
+      var arr = new Array();
+      for (var i = 0; i != data.length; ++i) {
+        arr[i] = String.fromCharCode(data[i]);
+      }
+      var bstr = arr.join("");
+
+      // Read Excel file
+      var workbook = XLSX.read(bstr, {
+        type: "binary"
+      });
+
+      // Get first sheet and convert to JSON
+      var sheet_name_list = workbook.SheetNames;
+      var jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+
+      // Create markers on the map
+      var markers = [];
+      jsonData.forEach(function (row) {
+        var lat = row["Latitude"];
+        var lng = row["Longitude"];
+        var year2 = row["Year"];
+        var type = row["Type"];
+        var country2 = row["Country"]; // 读取Country列数据
+        var location2 = row["Location"];
+        var origin2 = row["Origin"];
+        var video2 = "/land.mp4";
+        var marker = L.marker([lat, lng], {
+          icon: landSlideIcon
+        }).bindPopup(`
+    <div class="popup-content22">
+    <p class=""><strong>Flood Year:</strong> ${year2}</p>
+            <p class=""><strong>Country:</strong> ${country2}</p>
+            <p class=""><strong>Origin:</strong> ${origin2}</p>
+            <p class=""><strong>Location:</strong> ${location2}</p>
+            <p class=""><strong>Latitude:</strong> ${lat}</p>
+            <p class=""><strong>Longitude:</strong> ${lng}</p>
+            </div>
+            <video width="320" height="240" controls autoplay loop>
+                <source src="${video2}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+     `); // 将Country列数据绑定到标记的popup中
+        marker.type = type;
+        markers.push(marker);
+      });
+
+      var markerGroup = L.featureGroup(markers).addTo(map);
+
+
+      // Hide markers based on checkbox selection
+      var checkboxes = document.querySelectorAll('input[name="Landslide"]');
+
+      // Set the Landslide checkbox to be checked by default
+      checkboxes.forEach(function (checkbox) {
+        checkbox.checked = true;
+      });
+
+      checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+          var checkedTypes = document.querySelectorAll('input[name="Landslide"]:checked');
+          if (checkedTypes.length === 1) {
+            markerGroup.addTo(map);
+          } else {
+            markerGroup.removeFrom(map);
+            var filteredMarkers = markers.filter(function (marker) {
+              return Array.from(checkedTypes).some(function (type) {
+                return marker.type === type.value;
+              });
+            });
+            var filteredMarkerGroup = L.featureGroup(filteredMarkers).addTo(map);
+          }
+        });
+      });
+
+    };
+    landSlideReq.send();
+  </script>
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+    fetch("https://restcountries.com/v3.1/all")
+      .then((response) => response.json())
+      .then((countries) => {
+
+        var countryDropdown = document.querySelector(".dropdown2 .dropdown-content");
+
+        // Sort countries by name
+        countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+        countries.forEach((country) => {
+          var option = document.createElement("p");
+          option.classList.add("country-option");
+          option.textContent = country.name.common;
+          option.setAttribute("data-lat", country.latlng[0]);
+          option.setAttribute("data-lng", country.latlng[1]);
+          countryDropdown.appendChild(option);
+        });
+
+        // Add event listeners to the country options
+        var countryOptions = document.querySelectorAll(".country-option");
+        countryOptions.forEach(function (option) {
+          option.addEventListener("click", function () {
+            var lat = parseFloat(this.getAttribute("data-lat"));
+            var lng = parseFloat(this.getAttribute("data-lng"));
+            map.setView([lat, lng], 13);
+          });
+        });
+      });
+  </script>
+  <script>
+    window.userData = {
+      username: '<%= user.username %>',
+    };
+
+    const form = document.querySelector('.form1');
+    const input = form.querySelector('input[type="text"]');
+    const landmarkList = document.querySelector('#landmark-list');
+    const searchResults = document.querySelector('#search-results');
+
+    form.addEventListener('submit', function (event) {
+
+      const searchTerm = input.value.toLowerCase();
+
+      fetch(`/api/landmarks?search=${searchTerm}`)
+        .then(response => response.json())
+        .then(landmarks => {
+          if (landmarks.length > 0) {
+            const lat = landmarks[0].latitude;
+            const lng = landmarks[0].longitude;
+            map.setView([lat, lng], 10);
+          } else {
+            alert(`No results found for ${searchTerm}. Please try again.`);
+          }
+        })
+        .catch(error => {
+          console.error('Fetch error:', error);
+          event.target.setCustomValidity('Error submitting the comments. Please try again.');
+        });
+    });
+
+    input.addEventListener('input', function () {
+      const inputValue = input.value.toLowerCase();
+
+      if (inputValue === '') {
+        searchResults.style.display = 'none'; // 隐藏搜索结果框
+        return;
+      }
+
+      fetch(`/get-titles`)
+        .then(response => response.json())
+        .then(titles => {
+          searchResults.innerHTML = ''; // 清空searchResults的内容
+
+          titles.titles.forEach(function (titleData) {
+            const titleName = titleData.title.toLowerCase();
+            if (titleName.startsWith(inputValue)) {
+              const titleItem = document.createElement('p');
+              titleItem.textContent = titleData.title;
+              titleItem.classList.add('title-item');
+              titleItem.setAttribute('data-lat', titleData.latitude);
+              titleItem.setAttribute('data-lng', titleData.longitude);
+              titleItem.style.cursor = 'pointer';
+
+              titleItem.addEventListener('click', function () {
+                const lat = parseFloat(titleItem.getAttribute('data-lat'));
+                const lng = parseFloat(titleItem.getAttribute('data-lng'));
+                map.setView([lat, lng], 13);
+                searchResults.style.display = 'none';
+              });
+
+              searchResults.appendChild(titleItem);
+            }
+          });
+
+          if (searchResults.childElementCount > 0) {
+            searchResults.style.display = 'block';
+          } else {
+            searchResults.style.display = 'none';
+          }
+        })
+        .catch(error => {
+          console.error('Fetch error:', error);
+        });
+    });
+  </script>
+</body>
+
+</html>
