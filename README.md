@@ -1,4 +1,4 @@
-# Geohazard-System-main
+# Geohazard-System
 
 This program uses the node backend to run, so you need to download node before running, and set the corresponding environment variables. These libraries need to be installed before running:
 
